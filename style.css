@@ -1,0 +1,155 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+body {
+  font-family: "Microsoft JhengHei", Arial, sans-serif;
+  margin: 0;
+  background-color: #f8f9fa;
+}
+
+.content {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.content a {
+  text-decoration: none;
+  color: inherit;
+  border: #333 solid 1px;
+  border-radius: 10px;
+  padding: 5px 10px;
+}
+
+/* Error or status message style */
+.msg {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+/* Navbar on top right */
+.navbar {
+  background: #333;
+  color: white;
+  padding: 15px 30px;
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar .logo {
+  font-size: 1.2em;
+  font-weight: bold;
+
+  a {
+    color: #fff;
+    text-decoration: none;
+  }
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  margin-left: 15px;
+  padding: 8px 15px;
+  border-radius: 4px;
+  transition: 0.3s;
+}
+
+/* Buttons color */
+.btn-login {
+  border: 1px solid #4CAF50;
+  color: #4CAF50 !important;
+}
+
+.btn-login:hover {
+  background: #4CAF50;
+  color: white !important;
+}
+
+.btn-signup {
+  background: #007BFF;
+}
+
+.btn-signup:hover {
+  background: #0056b3;
+}
+
+.btn-logout {
+  color: #ff4d4d !important;
+  font-size: 0.9em;
+}
+
+/* Buttons used across pages */
+.btn-input,.btn { display:inline-block; padding:8px 14px; border-radius:6px; text-decoration:none; border:1px solid #007BFF; color:#007BFF; background:transparent; cursor:pointer; }
+.btn.primary { background:#007BFF; color:#fff; border-color:#007BFF; }
+
+/* product list / card (shared) */
+.product-list { max-width:900px; margin:0 auto; padding:0 15px; }
+.product-list ul { list-style-type:none; padding:0; margin:0; }
+.product-list li { background-color:white; margin-bottom:15px; padding:15px; border-radius:5px; box-shadow:0 2px 5px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center; }
+.product-details { flex:1; }
+.product-details strong { font-size:1.2em; color:#007bff; }
+.product-info { margin-top:10px; display:grid; grid-template-columns:1fr 180px; gap:12px 20px; align-items:start; line-height:1.4; }
+.product-row { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+.meta-left { display:flex; flex-direction:column; gap:4px; }
+.meta-right { text-align:right; min-width:140px; }
+.product-meta { color:#555; font-size:0.95em; }
+.meta-label { color:#666; margin-right:6px; font-weight:600; }
+.product-price { color:#e83e8c; font-weight:700; font-size:1.05em; }
+.product-desc { grid-column:1 / -1; color:#333; margin-top:8px; }
+.actions { margin-left:20px; text-align:center; }
+.sold-out-text { color:#dc3545; font-weight:bold; }
+@media (max-width:700px) { .product-list li { flex-direction:column; align-items:stretch; } .product-info { grid-template-columns:1fr; } .meta-right { text-align:left; } .actions { margin-left:0; margin-top:10px; } }
+
+/* shopping cart extras */
+.fixed-confirm { position:fixed; right:20px; bottom:20px; z-index:1000; }
+.inline-edit-controls { display:flex; gap:8px; align-items:center; }
+@media (max-width:480px) { .inline-edit-controls { flex-direction:column; align-items:flex-end; } }
+
+/* payment page */
+.payment-container { max-width:900px; margin:30px auto; padding:20px; background:#fff; border-radius:10px; }
+.payment-grid { display:grid; grid-template-columns:1fr 320px; gap:20px; align-items:start; }
+.card { padding:16px; border:1px solid #eee; border-radius:8px; }
+.items-table { width:100%; border-collapse:collapse; }
+.items-table th, .items-table td { padding:8px; border-bottom:1px solid #f0f0f0; text-align:left; }
+.summary { background:#f7f7f7; padding:16px; border-radius:8px; }
+.total { font-size:1.2em; font-weight:bold; margin-top:10px; }
+
+/* --- Overlay scrollbar: hide native and use custom overlay --- */
+/* Hide native scrollbar where possible (we'll provide our own overlay) */
+html, body { -ms-overflow-style: none; /* IE 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; }
+
+/* Overlay scrollbar container (fixed on the right) */
+.overlay-scrollbar { position: fixed; right: 6px; top: 0; height: 100vh; width: 12px; z-index: 2147483647; pointer-events: none; }
+.overlay-scrollbar .track { position: absolute; inset: 0; background: transparent; pointer-events: auto; }
+.overlay-scrollbar .thumb { position: absolute; right: 0; width: 8px; border-radius: 999px; background: rgba(0,0,0,0.28); transition: opacity 220ms ease, transform 120ms ease; opacity: 0; transform: translateY(0); pointer-events: auto; }
+.overlay-scrollbar:hover .thumb, .overlay-scrollbar.dragging .thumb, .overlay-scrollbar.show .thumb { opacity: 1; }
+
+/* Make overlay less intrusive on small screens */
+@media (max-width:700px) {
+  .overlay-scrollbar { right: 4px; width: 10px; }
+  .overlay-scrollbar .thumb { width: 6px; }
+}
