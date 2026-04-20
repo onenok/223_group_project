@@ -242,7 +242,7 @@ if ($hot_res->success) {
           <label>時間範圍：</label>
           <select id="timeRangeSelect" class="filter-select">
             <option value="1d">一天內</option>
-            <option value="1w">一週內</option>
+            <option value="5d">五天內</option>
             <option value="1m">一個月內</option>
             <option value="1y">一年內</option>
             <option value="5y">五年內</option>
@@ -257,15 +257,6 @@ if ($hot_res->success) {
             <option value="food">食品</option>
             <option value="toy">玩具</option>
             <option value="e-things">電子產品</option>
-          </select>
-        </div>
-        <div>
-          <label>選擇產品：</label>
-          <select id="productFilterSelect" class="filter-select" multiple>
-            <option value="all">所有產品</option>
-            <?php foreach ($products as $product): ?>
-              <option value="<?php echo $product['product_id']; ?>"><?php echo htmlspecialchars($product['product_name']); ?></option>
-            <?php endforeach; ?>
           </select>
         </div>
       </div>
@@ -369,14 +360,10 @@ if ($hot_res->success) {
     function updateTimeSeriesChart() {
       const timeRange = document.getElementById('timeRangeSelect').value;
       const filterType = document.getElementById('filterTypeSelect').value;
-      const productFilter = document.getElementById('productFilterSelect');
-      const productIds = Array.from(productFilter.selectedOptions)
-        .filter(option => option.value !== 'all')
-        .map(option => option.value);
 
-      fetch('get_time_series.php?time_range=' + timeRange +
-          '&filter_type=' + filterType +
-          '&product_ids=' + productIds.join(',')
+      fetch('get_time_series.php?t=' + new Date().getTime() +
+          '&time_range=' + timeRange +
+          '&filter_type=' + filterType
         )
         .then(response => {
           if (!response.ok) {
@@ -385,7 +372,9 @@ if ($hot_res->success) {
           return response.json();
         })
         .then(data => {
-          if (data.success && data.time_series_data) {
+          if (data.success && data.time_series_data?.length > 0) {
+            console.log(data)
+            console.log(data.sql)
             // 準備圖表資料
             const datasets = [];
             const colors = [
@@ -403,9 +392,13 @@ if ($hot_res->success) {
                 label: productData.product_name,
                 data: [],
                 borderColor: color.replace('0.5', '1'),
-                backgroundColor: color,
-                fill: false,
-                yAxisID: 'y-axis-1'
+                backgroundColor: color.replace('0.5', '0.1'), // 加上極淡的背景色
+                borderWidth: 2, // 線條粗細
+                pointRadius: 0, // 預設隱藏小圓點，像股票圖那樣平滑
+                pointHoverRadius: 5, // 滑鼠移上去才顯示點
+                fill: false, // 如果想要下方有陰影可以改成 true
+                tension: 0.1, // 稍微給一點曲線感 (0.1 - 0.4)
+                yAxisID: 'y'
               };
 
               // 準備資料點
@@ -435,38 +428,63 @@ if ($hot_res->success) {
               options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: {
-                  x: {
-                    type: 'time',
-                    time: {
-                      unit: 'day',
-                      displayFormats: {
-                        day: 'yyyy-MM-dd'
-                      }
-                    },
-                    title: {
-                      display: true,
-                      text: '日期'
-                    }
-                  },
-                  y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    title: {
-                      display: true,
-                      text: '銷售量'
-                    }
-                  }
+                interaction: {
+                  mode: 'index',
+                  intersect: false, // 滑鼠靠近就會觸發 tooltip，不用精準指到線上
                 },
                 plugins: {
                   legend: {
                     display: true,
-                    position: 'top'
+                    position: 'top',
                   },
                   tooltip: {
-                    mode: 'index',
-                    intersect: false
+                    enabled: true,
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)', // 白色背景更現代
+                    titleColor: '#333',
+                    bodyColor: '#666',
+                    borderColor: '#ddd',
+                    borderWidth: 1,
+                    padding: 10,
+                    displayColors: true,
+                    callbacks: {
+                      label: function(context) {
+                        return ` ${context.dataset.label}: ${context.parsed.y} 件`;
+                      }
+                    }
+                  }
+                },
+                scales: {
+                  x: {
+                    type: 'time',
+                    time: {
+                      // 根據時間範圍自動調整顯示格式
+                      unit: timeRange === '1d' || timeRange === '5d' ? 'hour' : 'day',
+                      displayFormats: {
+                        hour: 'HH:mm',
+                        day: 'MMM dd'
+                      },
+                      tooltipFormat: 'yyyy-MM-dd HH:mm' // Tooltip 顯示完整日期
+                    },
+                    grid: {
+                      display: false // 隱藏垂直網格線，讓畫面更乾淨（股票圖常見做法）
+                    },
+                    ticks: {
+                      maxRotation: 0, // 防止文字傾斜
+                      autoSkip: true,
+                      maxTicksLimit: 10 // 限制標籤數量，避免擁擠
+                    }
+                  },
+                  y: {
+                    position: 'right', // 股票圖習慣把數值放在右邊
+                    beginAtZero: true,
+                    grid: {
+                      color: 'rgba(200, 200, 200, 0.2)', // 淡淡的水平線
+                      drawBorder: false
+                    },
+                    title: {
+                      display: true,
+                      text: '銷售量',
+                    }
                   }
                 }
               }
@@ -483,6 +501,8 @@ if ($hot_res->success) {
             legendHtml += '</ul>';
             document.getElementById('chartLegend').innerHTML = legendHtml;
           } else {
+            // TODO: clear chart
+            //
             document.getElementById('chartLegend').innerHTML = '<p>暫無資料可顯示</p>';
           }
         })
@@ -498,7 +518,6 @@ if ($hot_res->success) {
     // 添加事件監聽器
     document.getElementById('timeRangeSelect').addEventListener('change', updateTimeSeriesChart);
     document.getElementById('filterTypeSelect').addEventListener('change', updateTimeSeriesChart);
-    document.getElementById('productFilterSelect').addEventListener('change', updateTimeSeriesChart);
 
     // 互補商品推薦
     document.getElementById('productSelect').addEventListener('change', function() {

@@ -4,7 +4,9 @@ $servername = "localhost";
 $username = "root";
 $password = "";
 $db_name = "223_group_project";
- 
+
+date_default_timezone_set('Asia/Hong_Kong');
+
 // create connection to DB
 $conn = new mysqli($servername, $username, $password, $db_name);
  
@@ -29,9 +31,33 @@ if (session_status() === PHP_SESSION_ACTIVE) {
 function safeQuery($sql, $types = null, $params = []) {
     global $conn;
     $stmt = $conn->prepare($sql);
-    $response = new stdClass(); // Create empty object to pack data
+    $response = new stdClass();
 
-    // if SQL prepare fails
+    // --- 新增：模擬組裝實際執行的 SQL ---
+    $fullSql = $sql;
+    if ($types && !empty($params)) {
+        $indexedParams = array_values($params);
+        // 使用正則表達式，每次替換一個問號
+        foreach ($indexedParams as $val) {
+            // 處理不同類型的資料顯示格式
+            if (is_null($val)) {
+                $valueToShow = 'NULL';
+            } elseif (is_string($val)) {
+                $valueToShow = "'" . $conn->real_escape_string($val) . "'";
+            } else {
+                $valueToShow = $val;
+            }
+            
+            // 每次只替換第一個出現的 ?
+            $pos = strpos($fullSql, '?');
+            if ($pos !== false) {
+                $fullSql = substr_replace($fullSql, $valueToShow, $pos, 1);
+            }
+        }
+    }
+    $response->executed_sql = $fullSql; // 將組裝好的 SQL 存入 response
+    // ----------------------------------
+
     if (!$stmt) {
         $response->success = false;
         $response->error = $conn->error;
@@ -53,6 +79,6 @@ function safeQuery($sql, $types = null, $params = []) {
     $result = $stmt->get_result();
     $response->result = $result; 
     
-    return $response; // pack everything back
+    return $response;
 }
 ?>

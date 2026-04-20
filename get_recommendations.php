@@ -5,86 +5,53 @@ require_once('connect.php');
 header('Content-Type: application/json');
 
 // 檢查用戶是否登入
-if (empty($_SESSION['login'])) {
+if (empty($_SESSION['login']) || empty($_SESSION['member_id'])) {
     echo json_encode(['success' => false, 'error' => '請先登入']);
     exit;
 }
 
-// 獲取產品ID
+$memberID = $_SESSION['member_id'];
 $product_id = $_GET['product_id'] ?? 0;
+
 if (!$product_id) {
     echo json_encode(['success' => false, 'error' => '缺少產品ID']);
     exit;
 }
 
-// 獲取目標產品資訊
-$product_res = safeQuery('SELECT * FROM products WHERE product_id = ?', 'i', [$product_id]);
-if (!$product_res->success || !$product_res->result || $product_res->result->num_rows === 0) {
-    echo json_encode(['success' => false, 'error' => '產品不存在']);
-    exit;
-}
-$product = $product_res->result->fetch_assoc();
-
-// 獲取購買記錄來分析關聯規則
-$purchase_records = [];
-$purchase_res = safeQuery('SELECT pr.*, p.product_id, p.product_name 
-                          FROM purchase_records pr 
-                          JOIN products p ON pr.product_id = p.product_id 
-                          ORDER BY pr.created_at DESC');
-if ($purchase_res->success) {
-    $purchase_records = $purchase_res->result->fetch_all(MYSQLI_ASSOC);
-}
-
-// 分析關聯規則（簡化版）
+/**
+ * 推薦邏輯更新：
+ * 1. 透過 JOIN 找出買過 $product_id 的會員買過的其他商品。
+ * 2. 排除商品 A 本身。
+ * 3. 使用子查詢 (NOT IN) 排除該會員目前購物車中已有的商品。
+ */
 $recommendations = [];
-if (!empty($purchase_records)) {
-    // 建立交易資料集
-    $transactions = [];
-    foreach ($purchase_records as $record) {
-        $transactions[$record['Member_id']][] = $record['product_id'];
-    }
 
-    // 找出包含目標產品的交易
-    $target_transactions = [];
-    foreach ($transactions as $member_id => $products) {
-        if (in_array($product_id, $products)) {
-            $target_transactions[] = $products;
-        }
-    }
+$sql = "SELECT p.product_id, p.product_name, p.price, COUNT(*) as association_score
+        FROM purchase_records pr1
+        JOIN purchase_records pr2 ON pr1.Member_id = pr2.Member_id
+        JOIN products p ON pr2.product_id = p.product_id
+        WHERE pr1.product_id = ?        /* 1. 目標商品 */
+        AND pr2.product_id <> ?         /* 2. 排除目標商品本身 */
+        AND p.product_id NOT IN (       /* 3. 排除已在購物車的商品 */
+            SELECT product_id 
+            FROM cart 
+            WHERE member_id = ?
+        )
+        GROUP BY p.product_id
+        ORDER BY association_score DESC
+        LIMIT 5";
 
-    // 計算推薦分數
-    $product_scores = [];
-    foreach ($target_transactions as $transaction) {
-        foreach ($transaction as $pid) {
-            if ($pid != $product_id) {
-                if (!isset($product_scores[$pid])) {
-                    $product_scores[$pid] = 0;
-                }
-                $product_scores[$pid] += 1;
-            }
-        }
-    }
+// 注意：這裡參數變成了三個 i (product_id, product_id, memberID)
+$res = safeQuery($sql, 'iii', [$product_id, $product_id, $memberID]);
 
-    // 排序並取得前5個推薦
-    arsort($product_scores);
-    $top_products = array_slice($product_scores, 0, 5, true);
-
-    // 獲取產品詳細資訊
-    if (!empty($top_products)) {
-        $placeholders = implode(',', array_fill(0, count($top_products), '?'));
-        $types = str_repeat('i', count($top_products));
-        $product_ids = array_keys($top_products);
-        $rec_res = safeQuery("SELECT * FROM products WHERE product_id IN ($placeholders)", $types, $product_ids);
-        if ($rec_res->success) {
-            $rec_products = $rec_res->result->fetch_all(MYSQLI_ASSOC);
-            foreach ($rec_products as $rec) {
-                $recommendations[] = [
-                    'product_id' => $rec['product_id'],
-                    'product_name' => $rec['product_name'],
-                    'score' => $top_products[$rec['product_id']]
-                ];
-            }
-        }
+if ($res->success && $res->result) {
+    while ($row = $res->result->fetch_assoc()) {
+        $recommendations[] = [
+            'product_id'   => $row['product_id'],
+            'product_name' => $row['product_name'],
+            'price'        => $row['price'],
+            'score'        => $row['association_score']
+        ];
     }
 }
 

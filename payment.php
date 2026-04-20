@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'confi
       'iii',
       [$memberID, $pid, $want]
     );
-    if (!$p_r_upload->success) {
+    if (!($p_r_upload->success && $p_r_upload->affected_rows>0)) {
       $pr_ok = false;
       break;
     }
