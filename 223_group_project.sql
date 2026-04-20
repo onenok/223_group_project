@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2026-04-19 13:50:41
+-- 產生時間： 2026-04-20 14:11:32
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
@@ -49,6 +49,16 @@ CREATE TABLE `cart` (
 --
 
 TRUNCATE TABLE `cart`;
+--
+-- 傾印資料表的資料 `cart`
+--
+
+INSERT INTO `cart` (`cart_id`, `member_id`, `product_id`, `snapshot_name`, `snapshot_price`, `snapshot_description`, `snapshot_type`, `qty`, `created_at`, `updated_at`) VALUES
+(64, 1, 24, 'Almond Milk Original', 22.90, 'Unsweetened plant-based milk', 'drinks', 1, '2026-04-20 19:45:36', '2026-04-20 19:45:36'),
+(65, 1, 28, 'Beef Jerky Spicy', 68.00, 'Premium tender beef jerky – hot & spicy', 'food', 1, '2026-04-20 19:45:39', '2026-04-20 19:45:39'),
+(66, 1, 8, '樂高經典積木 1000片', 399.00, '基礎創意積木組', 'toy', 1, '2026-04-20 20:03:46', '2026-04-20 20:03:46'),
+(67, 1, 23, 'Coconut Water', 18.00, 'Pure coconut water – no added sugar', 'drinks', 1, '2026-04-20 20:04:05', '2026-04-20 20:04:05');
+
 -- --------------------------------------------------------
 
 --
@@ -131,12 +141,12 @@ INSERT INTO `products` (`product_id`, `product_name`, `type`, `supplier`, `descr
 (20, '鳳梨酥禮盒 12入', 'food', '微熱山丘', '經典伴手禮', 380.00, 9, '2026-03-08 20:06:36', '2026-03-06 15:57:28'),
 (21, 'Green Tea Latte', 'drinks', 'Starbucks', 'Creamy matcha with milk and whipped cream', 38.00, 44, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
 (22, 'Espresso Shot', 'drinks', 'Illy', 'Single shot of strong Italian espresso', 28.50, 119, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
-(23, 'Coconut Water', 'drinks', 'Vita Coco', 'Pure coconut water – no added sugar', 18.00, 79, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
-(24, 'Almond Milk Original', 'drinks', 'Alpro', 'Unsweetened plant-based milk', 22.90, 59, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
+(23, 'Coconut Water', 'drinks', 'Vita Coco', 'Pure coconut water – no added sugar', 18.00, 77, '2026-04-20 16:16:32', '2026-03-07 14:16:57'),
+(24, 'Almond Milk Original', 'drinks', 'Alpro', 'Unsweetened plant-based milk', 22.90, 54, '2026-04-20 16:16:32', '2026-03-07 14:16:57'),
 (25, 'Strawberry Yogurt Drink', 'drinks', 'Yakult', 'Probiotic strawberry flavored yogurt drink', 12.50, 199, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
 (26, 'Potato Chips Sea Salt', 'food', 'Lay\'s', 'Classic thin & crispy potato chips', 18.00, 149, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
 (27, 'Dark Chocolate 70%', 'food', 'Lindt', 'Smooth Swiss dark chocolate bar', 45.00, 89, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
-(28, 'Beef Jerky Spicy', 'food', 'Jack Link\'s', 'Premium tender beef jerky – hot & spicy', 68.00, 69, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
+(28, 'Beef Jerky Spicy', 'food', 'Jack Link\'s', 'Premium tender beef jerky – hot & spicy', 68.00, 68, '2026-04-20 16:10:52', '2026-03-07 14:16:57'),
 (29, 'Dried Mango Slices', 'food', 'Philippine Brand', 'Sweet & chewy natural dried mango', 55.00, 109, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
 (30, 'Instant Ramen Spicy Chicken', 'food', 'Samyang', 'Extremely spicy Korean instant noodles', 15.90, 299, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
 (31, 'LEGO Classic Creative Box', 'toy', 'LEGO', 'Large box with 790 colorful bricks', 299.00, 34, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
@@ -145,8 +155,8 @@ INSERT INTO `products` (`product_id`, `product_name`, `type`, `supplier`, `descr
 (34, 'Magnetic Building Tiles', 'toy', 'PicassoTiles', '64-piece translucent magnetic tiles set', 399.00, 41, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
 (35, 'Wireless Gaming Mouse', 'e-things', 'Logitech', 'RGB gaming mouse with 16K DPI sensor', 299.00, 64, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
 (36, 'USB-C Hub 7-in-1', 'e-things', 'Anker', 'HDMI, SD reader, USB ports & PD charging', 198.00, 87, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
-(37, 'Portable SSD 1TB', 'e-things', 'Samsung T7', 'Fast USB 3.2 Gen2 external SSD – black', 799.00, 54, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
-(38, 'Bluetooth Speaker Mini', 'e-things', 'JBL Go 3', 'Waterproof portable speaker with rich sound', 349.00, 94, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
+(37, 'Portable SSD 1TB', 'e-things', 'Samsung T7', 'Fast USB 3.2 Gen2 external SSD – black', 799.00, 53, '2026-04-20 18:19:58', '2026-03-07 14:16:57'),
+(38, 'Bluetooth Speaker Mini', 'e-things', 'JBL Go 3', 'Waterproof portable speaker with rich sound', 349.00, 93, '2026-04-20 16:16:32', '2026-03-07 14:16:57'),
 (39, 'Smart LED Bulb E27', 'e-things', 'Philips Hue', 'Color & white ambiance – works with Alexa', 129.00, 139, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
 (40, 'Mechanical Keyboard RGB', 'e-things', 'Keychron K2', 'Wireless hot-swappable mechanical keyboard', 599.00, 37, '2026-03-08 20:06:36', '2026-03-07 14:16:57');
 
@@ -177,7 +187,16 @@ TRUNCATE TABLE `purchase_records`;
 INSERT INTO `purchase_records` (`records_id`, `Member_id`, `product_id`, `qty`, `created_at`) VALUES
 (1, 1, 8, 1, '2026-04-19 15:37:15'),
 (2, 1, 7, 1, '2026-04-19 15:37:15'),
-(3, 1, 9, 2, '2026-04-19 15:37:15');
+(3, 1, 9, 2, '2026-04-19 15:37:15'),
+(4, 1, 24, 1, '2026-04-20 16:01:42'),
+(6, 1, 24, 1, '2026-04-20 16:09:59'),
+(7, 1, 28, 1, '2026-04-20 16:10:52'),
+(8, 1, 24, 1, '2026-04-20 16:11:39'),
+(9, 1, 24, 1, '2026-04-20 16:12:55'),
+(10, 1, 24, 1, '2026-04-20 16:16:32'),
+(11, 1, 38, 1, '2026-04-20 16:16:32'),
+(12, 1, 23, 2, '2026-04-20 16:16:32'),
+(13, 1, 37, 1, '2026-04-20 18:19:58');
 
 --
 -- 已傾印資料表的索引
@@ -220,7 +239,7 @@ ALTER TABLE `purchase_records`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '購物車項目唯一編號', AUTO_INCREMENT=55;
+  MODIFY `cart_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '購物車項目唯一編號', AUTO_INCREMENT=68;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `member`
@@ -238,7 +257,7 @@ ALTER TABLE `products`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `purchase_records`
 --
 ALTER TABLE `purchase_records`
-  MODIFY `records_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `records_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- 已傾印資料表的限制式
