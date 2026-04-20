@@ -362,133 +362,133 @@ if ($hot_res->success) {
       }
     });
 
-// 時間軸圖表
-let timeSeriesChart = null;
+    // 時間軸圖表
+    let timeSeriesChart = null;
 
-function updateTimeSeriesChart() {
-    const timeRange = document.getElementById('timeRangeSelect').value;
-    const filterType = document.getElementById('filterTypeSelect').value;
-    const productFilter = document.getElementById('productFilterSelect');
-    const productIds = Array.from(productFilter.selectedOptions)
+    function updateTimeSeriesChart() {
+      const timeRange = document.getElementById('timeRangeSelect').value;
+      const filterType = document.getElementById('filterTypeSelect').value;
+      const productFilter = document.getElementById('productFilterSelect');
+      const productIds = Array.from(productFilter.selectedOptions)
         .filter(option => option.value !== 'all')
         .map(option => option.value);
 
-    fetch('get_time_series.php?time_range=' + timeRange +
+      fetch('get_time_series.php?time_range=' + timeRange +
           '&filter_type=' + filterType +
           '&product_ids=' + productIds.join(','))
         .then(response => {
-            if (!response.ok) {
-                throw new Error('網路請求失敗: ' + response.statusText);
-            }
-            return response.json();
+          if (!response.ok) {
+            throw new Error('網路請求失敗: ' + response.statusText);
+          }
+          return response.json();
         })
         .then(data => {
-            if (data.success && data.time_series_data) {
-                // 準備圖表資料
-                const datasets = [];
-                const colors = [
-                    'rgba(255, 99, 132, 0.5)',
-                    'rgba(54, 162, 235, 0.5)',
-                    'rgba(255, 206, 86, 0.5)',
-                    'rgba(75, 192, 192, 0.5)',
-                    'rgba(153, 102, 255, 0.5)',
-                    'rgba(255, 159, 64, 0.5)'
-                ];
+          if (data.success && data.time_series_data) {
+            // 準備圖表資料
+            const datasets = [];
+            const colors = [
+              'rgba(255, 99, 132, 0.5)',
+              'rgba(54, 162, 235, 0.5)',
+              'rgba(255, 206, 86, 0.5)',
+              'rgba(75, 192, 192, 0.5)',
+              'rgba(153, 102, 255, 0.5)',
+              'rgba(255, 159, 64, 0.5)'
+            ];
 
-                data.time_series_data.forEach((productData, index) => {
-                    const color = colors[index % colors.length];
-                    const dataset = {
-                        label: productData.product_name,
-                        data: [],
-                        borderColor: color.replace('0.5', '1'),
-                        backgroundColor: color,
-                        fill: false,
-                        yAxisID: 'y-axis-1'
-                    };
+            data.time_series_data.forEach((productData, index) => {
+              const color = colors[index % colors.length];
+              const dataset = {
+                label: productData.product_name,
+                data: [],
+                borderColor: color.replace('0.5', '1'),
+                backgroundColor: color,
+                fill: false,
+                yAxisID: 'y-axis-1'
+              };
 
-                    // 準備資料點
-                    const dates = Object.keys(productData.data).sort();
-                    dates.forEach(date => {
-                        const qty = productData.data[date].total_qty;
-                        dataset.data.push({
-                            x: date,
-                            y: qty
-                        });
-                    });
-
-                    datasets.push(dataset);
+              // 準備資料點
+              const dates = Object.keys(productData.data).sort();
+              dates.forEach(date => {
+                const qty = productData.data[date].total_qty;
+                dataset.data.push({
+                  x: date,
+                  y: qty
                 });
+              });
 
-                // 更新圖表
-                if (timeSeriesChart) {
-                    timeSeriesChart.destroy();
-                }
+              datasets.push(dataset);
+            });
 
-                const ctx = document.getElementById('timeSeriesChart').getContext('2d');
-                timeSeriesChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        datasets: datasets
+            // 更新圖表
+            if (timeSeriesChart) {
+              timeSeriesChart.destroy();
+            }
+
+            const ctx = document.getElementById('timeSeriesChart').getContext('2d');
+            timeSeriesChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                datasets: datasets
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  x: {
+                    type: 'time',
+                    time: {
+                      unit: 'day',
+                      displayFormats: {
+                        day: 'YYYY-MM-DD'
+                      }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            x: {
-                                type: 'time',
-                                time: {
-                                    unit: 'day',
-                                    displayFormats: {
-                                        day: 'YYYY-MM-DD'
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: '日期'
-                                }
-                            },
-                            y: {
-                                type: 'linear',
-                                display: true,
-                                position: 'left',
-                                title: {
-                                    display: true,
-                                    text: '銷售量'
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top'
-                            },
-                            tooltip: {
-                                mode: 'index',
-                                intersect: false
-                            }
-                        }
+                    title: {
+                      display: true,
+                      text: '日期'
                     }
-                });
+                  },
+                  y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                      display: true,
+                      text: '銷售量'
+                    }
+                  }
+                },
+                plugins: {
+                  legend: {
+                    display: true,
+                    position: 'top'
+                  },
+                  tooltip: {
+                    mode: 'index',
+                    intersect: false
+                  }
+                }
+              }
+            });
 
-                // 更新圖例
-                let legendHtml = '<h3 style="margin-top: 1rem;">圖例：</h3><ul>';
-                data.time_series_data.forEach((productData, index) => {
-                    const color = colors[index % colors.length];
-                    legendHtml += `<li style="color: ${color.replace('0.5', '1')}; margin-bottom: 0.5rem;">
+            // 更新圖例
+            let legendHtml = '<h3 style="margin-top: 1rem;">圖例：</h3><ul>';
+            data.time_series_data.forEach((productData, index) => {
+              const color = colors[index % colors.length];
+              legendHtml += `<li style="color: ${color.replace('0.5', '1')}; margin-bottom: 0.5rem;">
                                       <strong>${productData.product_name}</strong> (${productData.type})
                                     </li>`;
-                });
-                legendHtml += '</ul>';
-                document.getElementById('chartLegend').innerHTML = legendHtml;
-            } else {
-                document.getElementById('chartLegend').innerHTML = '<p>暫無資料可顯示</p>';
-            }
+            });
+            legendHtml += '</ul>';
+            document.getElementById('chartLegend').innerHTML = legendHtml;
+          } else {
+            document.getElementById('chartLegend').innerHTML = '<p>暫無資料可顯示</p>';
+          }
         })
         .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('chartLegend').innerHTML = '<p>載入資料時發生錯誤</p>';
+          console.error('Error:', error);
+          document.getElementById('chartLegend').innerHTML = '<p>載入資料時發生錯誤</p>';
         });
-}
+    }
 
     // 初始載入圖表
     updateTimeSeriesChart();
