@@ -51,6 +51,7 @@ if ($hot_res->success) {
   <title>管理頁面 - 資料採礦分析</title>
   <link rel="stylesheet" href="style.css?v=<?php echo filemtime('style.css'); ?>">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
   <style>
     .admin-container {
       max-width: 1200px;
@@ -375,7 +376,8 @@ if ($hot_res->success) {
 
       fetch('get_time_series.php?time_range=' + timeRange +
           '&filter_type=' + filterType +
-          '&product_ids=' + productIds.join(','))
+          '&product_ids=' + productIds.join(',')
+        )
         .then(response => {
           if (!response.ok) {
             throw new Error('網路請求失敗: ' + response.statusText);
@@ -439,7 +441,7 @@ if ($hot_res->success) {
                     time: {
                       unit: 'day',
                       displayFormats: {
-                        day: 'YYYY-MM-DD'
+                        day: 'yyyy-MM-dd'
                       }
                     },
                     title: {
@@ -475,8 +477,8 @@ if ($hot_res->success) {
             data.time_series_data.forEach((productData, index) => {
               const color = colors[index % colors.length];
               legendHtml += `<li style="color: ${color.replace('0.5', '1')}; margin-bottom: 0.5rem;">
-                                      <strong>${productData.product_name}</strong> (${productData.type})
-                                    </li>`;
+                              <strong>${productData.product_name}</strong> (${productData.type})
+                            </li>`;
             });
             legendHtml += '</ul>';
             document.getElementById('chartLegend').innerHTML = legendHtml;

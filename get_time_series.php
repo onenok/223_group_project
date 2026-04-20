@@ -105,14 +105,15 @@ if (!empty($records)) {
     // 建立時間序列框架
     $current_date = $start_date ? clone $start_date : null;
     $end_date_obj = $end_date;
-    
+
     while ($current_date === null || $current_date <= $end_date_obj) {
         $date_str = $current_date ? $current_date->format('Y-m-d') : '總計';
-        
+
         foreach ($records as $record) {
             $product_id = $record['product_id'];
             $purchase_date = $record['purchase_date'] ?? '總計';
-            
+
+            // 只處理有購買記錄的產品
             if ($date_str === $purchase_date || $date_str === '總計') {
                 if (!isset($time_series_data[$product_id])) {
                     $time_series_data[$product_id] = [
@@ -122,7 +123,7 @@ if (!empty($records)) {
                         'data' => []
                     ];
                 }
-                
+
                 if (!isset($time_series_data[$product_id]['data'][$date_str])) {
                     $time_series_data[$product_id]['data'][$date_str] = [
                         'date' => $date_str,
@@ -130,12 +131,12 @@ if (!empty($records)) {
                         'transaction_count' => 0
                     ];
                 }
-                
+
                 $time_series_data[$product_id]['data'][$date_str]['total_qty'] += $record['total_qty'];
                 $time_series_data[$product_id]['data'][$date_str]['transaction_count'] += $record['transaction_count'];
             }
         }
-        
+
         if ($current_date !== null) {
             $current_date->modify('+1 day');
             if ($current_date > $end_date_obj) {
@@ -145,7 +146,7 @@ if (!empty($records)) {
             break;
         }
     }
-    
+
     // 準備產品資訊
     foreach ($time_series_data as $product_id => $product_data) {
         $product_info[$product_id] = [
