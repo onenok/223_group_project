@@ -38,19 +38,50 @@ if ($res_types->success) {
     error_log("Failed to fetch product types: " . $res_types->error);
 }
 $showingType = $_GET['type'] ?? '';
+$sortType = $_GET['sort'] ?? 'name_asc'; // 預設 A-Z 排序
+
 // products get from database
 $products = [];
 try {
-    $sql = "SELECT * FROM products";
-    $response = null;
-    if ($showingType) {
-        $sql = "SELECT * FROM products WHERE type = ?";
+    $params = [];
+    $paramTypes = '';
+
+    // 根據排序方式選擇 SQL
+    switch ($sortType) {
+        case 'name_asc':
+            $sql = "SELECT * FROM products";
+            if ($showingType) {
+                $sql .= " WHERE type = ?";
+                $params[] = $showingType;
+                $paramTypes .= 's';
+            }
+            $sql .= " ORDER BY product_name ASC";
+            break;
+
+        case 'name_desc':
+            $sql = "SELECT * FROM products";
+            if ($showingType) {
+                $sql .= " WHERE type = ?";
+                $params[] = $showingType;
+                $paramTypes .= 's';
+            }
+            $sql .= " ORDER BY product_name DESC";
+            break;
+
+        case 'hot':
+            $sql = "SELECT p.*, COALESCE(SUM(pr.qty), 0) as total_sales
+                    FROM products p
+                    LEFT JOIN purchase_records pr ON p.product_id = pr.product_id";
+            if ($showingType) {
+                $sql .= " WHERE p.type = ?";
+                $params[] = $showingType;
+                $paramTypes .= 's';
+            }
+            $sql .= " GROUP BY p.product_id ORDER BY total_sales DESC";
+            break;
     }
-    if ($showingType) {
-        $response = safeQuery($sql, 's', [$showingType]);
-    } else {
-        $response = safeQuery($sql);
-    }
+
+    $response = safeQuery($sql, $paramTypes, $params);
     if ($response->success) {
         $products = $response->result->fetch_all(MYSQLI_ASSOC);
     } else {
@@ -229,53 +260,6 @@ try {
             color: white;
             cursor: default;
         }
-
-        /* modal overlay */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            width: 300px;
-            max-width: 90%;
-            text-align: center;
-            position: relative;
-        }
-
-        .modal-footer {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .modal-footer button {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-
-        .confirm-btn {
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        .cancel-btn {
-            background-color: #dc3545;
-            color: #fff;
-        }
     </style>
 </head>
 
@@ -296,14 +280,23 @@ try {
 
         <div class="filter-container">
             <select onchange="location = this.value;" class="filter-select">
-                <option value="product_list.php" <?php if (!$showingType) echo 'selected'; ?>>全部類型</option>
+                <option
+                    value="product_list.php<?php echo "?sort=" . $sortType ?>"
+                    <?php if (!$showingType) echo 'selected'; ?>>
+                    全部類型
+                </option>
                 <?php
                 // Get distinct types from products for filter options
                 foreach ($product_types as $type) {
                     $selected = ($type === $showingType) ? 'selected' : '';
-                    echo "<option value='product_list.php?type=" . urlencode($type) . "' $selected>" . htmlspecialchars($type) . "</option>";
+                    echo "<option value='product_list.php?type=" . $type . "&sort=" . $sortType . "' $selected>" . htmlspecialchars($type) . "</option>";
                 }
                 ?>
+            </select>
+            <select onchange="location = this.value;" class="filter-select">
+                <option value="product_list.php?<?php if ($showingType) echo 'type=' . $showingType . "&" ?>sort=name_asc" <?php if ($sortType === 'name_asc') echo 'selected'; ?>>A-Z 排序</option>
+                <option value="product_list.php?<?php if ($showingType) echo 'type=' . $showingType . "&" ?>sort=name_desc" <?php if ($sortType === 'name_desc') echo 'selected'; ?>>Z-A 排序</option>
+                <option value="product_list.php?<?php if ($showingType) echo 'type=' . $showingType . "&" ?>sort=hot" <?php if ($sortType === 'hot') echo 'selected'; ?>>熱銷排序</option>
             </select>
         </div>
         <?php if ($showingType): ?>

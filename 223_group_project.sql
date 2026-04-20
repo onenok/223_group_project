@@ -3,13 +3,14 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2026-03-08 15:55:41
+-- 產生時間： 2026-04-19 13:50:41
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
+SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = "+08:00";
+SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,8 +19,10 @@ SET time_zone = "+08:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- 資料庫： `lab6`
+-- 資料庫： `223_group_project`
 --
+CREATE DATABASE IF NOT EXISTS `223_group_project` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `223_group_project`;
 
 -- --------------------------------------------------------
 
@@ -27,10 +30,11 @@ SET time_zone = "+08:00";
 -- 資料表結構 `cart`
 --
 
+DROP TABLE IF EXISTS `cart`;
 CREATE TABLE `cart` (
-  `cart_id` bigint(20) NOT NULL COMMENT '購物車項目唯一編號',
+  `cart_id` bigint(20) UNSIGNED NOT NULL COMMENT '購物車項目唯一編號',
   `member_id` int(10) UNSIGNED NOT NULL COMMENT '會員帳號',
-  `product_id` int(11) NOT NULL COMMENT '商品編號（參考 products 表）',
+  `product_id` int(11) UNSIGNED NOT NULL COMMENT '商品編號（參考 products 表）',
   `snapshot_name` varchar(100) NOT NULL COMMENT '加入時的商品名稱',
   `snapshot_price` decimal(10,2) NOT NULL COMMENT '加入時的價格',
   `snapshot_description` text DEFAULT NULL COMMENT '加入時的描述（可選）',
@@ -40,12 +44,18 @@ CREATE TABLE `cart` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '最後修改時間'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='購物車（快照版）';
 
+--
+-- 資料表新增資料前，先清除舊資料 `cart`
+--
+
+TRUNCATE TABLE `cart`;
 -- --------------------------------------------------------
 
 --
 -- 資料表結構 `member`
 --
 
+DROP TABLE IF EXISTS `member`;
 CREATE TABLE `member` (
   `Member_id` int(10) UNSIGNED NOT NULL,
   `loginname` varchar(50) NOT NULL COMMENT '登入帳號，註冊後不可更改',
@@ -57,6 +67,11 @@ CREATE TABLE `member` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='會員資料表';
 
+--
+-- 資料表新增資料前，先清除舊資料 `member`
+--
+
+TRUNCATE TABLE `member`;
 --
 -- 傾印資料表的資料 `member`
 --
@@ -76,8 +91,9 @@ INSERT INTO `member` (`Member_id`, `loginname`, `pwd`, `member_name`, `member_te
 -- 資料表結構 `products`
 --
 
+DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
-  `product_id` int(11) NOT NULL,
+  `product_id` int(11) UNSIGNED NOT NULL,
   `product_name` varchar(100) NOT NULL,
   `type` enum('drinks','food','toy','e-things') NOT NULL,
   `supplier` varchar(80) DEFAULT NULL,
@@ -89,6 +105,11 @@ CREATE TABLE `products` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- 資料表新增資料前，先清除舊資料 `products`
+--
+
+TRUNCATE TABLE `products`;
+--
 -- 傾印資料表的資料 `products`
 --
 
@@ -97,9 +118,9 @@ INSERT INTO `products` (`product_id`, `product_name`, `type`, `supplier`, `descr
 (3, '礦泉水 600ml', 'drinks', '康師傅', '天然弱鹼性水', 8.00, 0, '2026-03-07 22:38:29', '2026-03-06 15:57:28'),
 (5, '巧克力夾心餅乾', 'food', 'OREO', '酥脆可口夾心', 52.50, 0, '2026-03-08 20:06:36', '2026-03-06 15:57:28'),
 (6, '牛肉乾原味', 'food', '老四川', '香辣軟嫩牛肉乾', 68.00, 3, '2026-03-08 22:54:12', '2026-03-06 15:57:28'),
-(7, '泰國芒果乾', 'food', '泰國皇家', '天然果乾無添加', 55.00, 3, '2026-03-08 22:54:01', '2026-03-06 15:57:28'),
-(8, '樂高經典積木 1000片', 'toy', 'LEGO', '基礎創意積木組', 399.00, 9, '2026-03-08 20:06:36', '2026-03-06 15:57:28'),
-(9, '毛絨泰迪熊 50cm', 'toy', '迪士尼授權', '超軟Q彈抱抱熊', 280.00, 9, '2026-03-08 20:06:36', '2026-03-06 15:57:28'),
+(7, '泰國芒果乾', 'food', '泰國皇家', '天然果乾無添加', 55.00, 2, '2026-04-19 15:37:15', '2026-03-06 15:57:28'),
+(8, '樂高經典積木 1000片', 'toy', 'LEGO', '基礎創意積木組', 399.00, 8, '2026-04-19 15:37:15', '2026-03-06 15:57:28'),
+(9, '毛絨泰迪熊 50cm', 'toy', '迪士尼授權', '超軟Q彈抱抱熊', 280.00, 7, '2026-04-19 15:37:15', '2026-03-06 15:57:28'),
 (10, '遙控賽車 1:16', 'toy', 'Double Eagle', '高速四驅越野車', 450.00, 9, '2026-03-08 20:06:36', '2026-03-06 15:57:28'),
 (11, '泡泡槍 電動', 'toy', '玩具反斗城', '夏天戶外必備', 120.00, 9, '2026-03-08 20:06:36', '2026-03-06 15:57:28'),
 (12, '無線藍牙耳機 TWS', 'e-things', '小米', '降噪入耳式', 499.00, 0, '2026-03-07 22:38:29', '2026-03-06 15:57:28'),
@@ -129,6 +150,35 @@ INSERT INTO `products` (`product_id`, `product_name`, `type`, `supplier`, `descr
 (39, 'Smart LED Bulb E27', 'e-things', 'Philips Hue', 'Color & white ambiance – works with Alexa', 129.00, 139, '2026-03-08 20:06:36', '2026-03-07 14:16:57'),
 (40, 'Mechanical Keyboard RGB', 'e-things', 'Keychron K2', 'Wireless hot-swappable mechanical keyboard', 599.00, 37, '2026-03-08 20:06:36', '2026-03-07 14:16:57');
 
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `purchase_records`
+--
+
+DROP TABLE IF EXISTS `purchase_records`;
+CREATE TABLE `purchase_records` (
+  `records_id` int(10) UNSIGNED NOT NULL,
+  `Member_id` int(10) UNSIGNED NOT NULL,
+  `product_id` int(11) UNSIGNED NOT NULL,
+  `qty` int(10) UNSIGNED NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- 資料表新增資料前，先清除舊資料 `purchase_records`
+--
+
+TRUNCATE TABLE `purchase_records`;
+--
+-- 傾印資料表的資料 `purchase_records`
+--
+
+INSERT INTO `purchase_records` (`records_id`, `Member_id`, `product_id`, `qty`, `created_at`) VALUES
+(1, 1, 8, 1, '2026-04-19 15:37:15'),
+(2, 1, 7, 1, '2026-04-19 15:37:15'),
+(3, 1, 9, 2, '2026-04-19 15:37:15');
+
 --
 -- 已傾印資料表的索引
 --
@@ -155,6 +205,14 @@ ALTER TABLE `products`
   ADD PRIMARY KEY (`product_id`);
 
 --
+-- 資料表索引 `purchase_records`
+--
+ALTER TABLE `purchase_records`
+  ADD PRIMARY KEY (`records_id`),
+  ADD KEY `Member_id` (`Member_id`),
+  ADD KEY `PR_product_id` (`product_id`);
+
+--
 -- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
 --
 
@@ -162,7 +220,7 @@ ALTER TABLE `products`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '購物車項目唯一編號', AUTO_INCREMENT=52;
+  MODIFY `cart_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '購物車項目唯一編號', AUTO_INCREMENT=55;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `member`
@@ -174,7 +232,13 @@ ALTER TABLE `member`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `product_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `purchase_records`
+--
+ALTER TABLE `purchase_records`
+  MODIFY `records_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- 已傾印資料表的限制式
@@ -185,7 +249,15 @@ ALTER TABLE `products`
 --
 ALTER TABLE `cart`
   ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `member` (`Member_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- 資料表的限制式 `purchase_records`
+--
+ALTER TABLE `purchase_records`
+  ADD CONSTRAINT `PR_member_id` FOREIGN KEY (`Member_id`) REFERENCES `member` (`Member_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `PR_product_id` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+SET FOREIGN_KEY_CHECKS=1;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

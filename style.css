@@ -54,6 +54,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  z-index: 99999;
 }
 
 .navbar .logo {
