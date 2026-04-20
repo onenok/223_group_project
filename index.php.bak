@@ -1,11 +1,11 @@
 <?php
 session_start();
-require_once 'connect.php';
+
 // 1. Check if user is logged-in (true/false)
 $isLoggedIn = !empty($_SESSION['login']);
 // If yes, use their name. If no, they are just a "Visitor"
 $username = $isLoggedIn ? $_SESSION['login'] : "訪客";
-$userId = $isLoggedIn ? $_SESSION['member_id'] : null;
+
 // 2. All messages to show on top of home page
 $messages = [
     'signup_already_logged_in' => '您已經登入了，無法註冊新帳號。',
@@ -61,7 +61,7 @@ $display_msg = $messages[$msg_key] ?? '';
             border: 1px solid #ddd;
             padding: 20px;
             border-radius: 8px;
-            width: fit-content;
+            width: 150px;
             text-decoration: none;
             color: #333;
             transition: 0.2s;

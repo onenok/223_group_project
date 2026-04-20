@@ -52,7 +52,7 @@ if ($res->result && $res->result->num_rows > 0) {
 
 // 6. insert new user
 $hashed = password_hash($pwd, PASSWORD_DEFAULT);
-$sql_insert = "INSERT INTO member(loginname, pwd, member_name, member_telno, member_addr) VALUES (?, ?, ?, ?, ?)";
+$sql_insert = "INSERT INTO member(loginname, pwd, member_name, tel, addr) VALUES (?, ?, ?, ?, ?)";
 $res = safeQuery($sql_insert, "sssss", [$name, $hashed, $dName, $tel, $addr]);
 
 // 7. Check if 1 row was added successfully

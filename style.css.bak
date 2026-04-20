@@ -46,7 +46,6 @@ h1 {
 
 /* Navbar on top right */
 .navbar {
-  z-index: 99999;
   background: #333;
   color: white;
   padding: 15px 30px;
@@ -55,6 +54,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  z-index: 99999;
 }
 
 .navbar .logo {
